@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "app",
+    name: "InukCMS",
     platforms: [
        .macOS(.v10_15),
     ],
@@ -14,12 +14,12 @@ let package = Package(
         // 💧 A server-side Swift web framework.
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0-rc.1"),
         .package(url: "https://github.com/vapor/fluent.git", from: "4.0.0-rc.1"),
-        .package(url: "https://github.com/vapor/fluent-sqlite-driver.git", from: "4.0.0-rc.1"),
+        .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.0.0-rc.1"),
     ],
     targets: [
         .target(name: "App", dependencies: [
             .product(name: "Fluent", package: "fluent"),
-            .product(name: "FluentSQLiteDriver", package: "fluent-sqlite-driver"),
+            .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
             .product(name: "Vapor", package: "vapor"),
         ]),
         .target(name: "Run", dependencies: [
