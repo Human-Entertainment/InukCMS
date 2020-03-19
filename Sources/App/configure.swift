@@ -9,10 +9,11 @@ public func configure(_ app: Application) throws {
 
     // Configure SQLite database
     app.databases.use(.postgres(
-        hostname: Environment.get("PHostname") ?? "localhost",
-        username: Environment.get("PUname") ?? "vapor",
-        password: Environment.get("PPassword") ?? "password"
-        ), as: .psql)
+        hostname: Environment.get("POSTGRES_HOSTNAME") ?? "localhost",
+        username: Environment.get("POSTGRES_USER") ?? "vapor_username",
+        password: Environment.get("POSTGRES_PASSWORD") ?? "vapor_password",
+        database: Environment.get("POSTGRES_DB") ?? "vapor_database"
+    ), as: .psql)
     // Configure migrations
     //app.migrations.add(CreateTodo())
     
