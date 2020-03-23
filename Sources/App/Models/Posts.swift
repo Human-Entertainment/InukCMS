@@ -13,7 +13,7 @@ typealias Slug = String
 typealias MarkDown = String
 
 final class Post: Model {
-    static var schema: String = "post"
+    static var schema: String = "posts"
     
     @ID(key:"id")
     var id: UUID?
@@ -25,18 +25,7 @@ final class Post: Model {
     var title: String
     
     @Field(key:"body")
-    var _body: MarkDown
-    
-    var body: MarkDown {
-        get {
-            var parser = MarkdownParser()
-            let markdown: String = _body
-            return parser.html(from: markdown)
-        }
-        set(markdown) {
-            _body = markdown
-        }
-    }
+    var body: MarkDown
     
     @Field(key:"roles")
     var roles: PostRole
@@ -78,4 +67,8 @@ struct PostRole: Codable, OptionSet {
     
     static let blogPost = PostRole(rawValue: 1)
     static let navBar = PostRole(rawValue: 1 << 1)
+}
+
+extension Post: CustomStringConvertible {
+    var description: String { return self.title }
 }

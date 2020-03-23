@@ -13,7 +13,9 @@ struct IndexController: RouteCollection {
         routes.get("", use: index)
     }
     
-    func index(req: Request) throws -> HTML {
-        IndexViews.index()
+    func index(req: Request) throws -> EventLoopFuture<HTML> {
+        Post.query(on: req.db).all().map{
+            IndexViews.index(posts: $0)
+        }
     }
 }

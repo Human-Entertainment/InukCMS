@@ -7,8 +7,6 @@
 
 import Plot
 
-let myPost = Post(title: "hello", body: "# Hello", roles: .navBar)
-
 struct IndexViews {
     
     /**
@@ -18,17 +16,17 @@ struct IndexViews {
         - body: the body that's passed int the templat
      - Returns: A build HTML to be used by anything really
     */
-    static func template(title: String, _ body: () -> (Node<HTML.BodyContext>)) -> HTML {
+    static func template(posts: [Post], title: String, _ body: () -> (Node<HTML.BodyContext>)) -> HTML {
         HTML(.head(.title(title)),
              .body(
-                navbar(pages: [myPost]),
-                /*.main(*/body()/*)*/
+                navbar(pages: posts),
+                .main(body())
             )
         )
     }
-    static func index() -> HTML {
-        template(title: "Inuk Entatinment") {
-            .raw(myPost.body)
+    static func index(posts: [Post]) -> HTML {
+        template(posts: posts, title: "Inuk Entatinment") {
+            .raw("It worked")
         }
     }
     
