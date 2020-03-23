@@ -16,7 +16,7 @@ struct PostsController: RouteCollection {
     func addPost(req: Request) throws -> EventLoopFuture<HTTPStatus> {
         let post = try req.content.decode(Post.self)
         return post.save(on: req.db).map{
-            HTTPStatus.ok
+            .created
         }
     }
 }

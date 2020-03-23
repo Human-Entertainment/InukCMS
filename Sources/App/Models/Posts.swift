@@ -8,11 +8,13 @@
 import Fluent
 import Plot
 import Ink
+import Foundation
 
 typealias Slug = String
 typealias MarkDown = String
 
 final class Post: Model {
+    private let markdownParser = MarkdownParser()
     static var schema: String = "posts"
     
     @ID(key:"id")
@@ -41,13 +43,60 @@ final class Post: Model {
             - body: A markdown or html representation of the page, this uses plot to render
             - roles: Some posts and pages have special roles, should they be displayed in the navbar, shown as a blog etc. See `PostRoles` for more info
      */
-    init(id: UUID? = nil, slug: Slug? = nil, title: String, body: MarkDown, roles: PostRole = .blogPost) {
+    init(id: UUID? = nil, slug: Slug? = nil, title: String? = nil, body: MarkDown, roles: PostRole = .blogPost) {
         self.id = id
-        self.slug = slug ?? title
-        self.title = title
         self.body = body
+        self.slug = slug ??
+            title?
+                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ??
+            markdownParser
+                .parse(body)
+                .title?
+                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        self.title = title ?? markdownParser.parse(body).title ?? ""
         self.roles = roles
     }
+
+}
+
+extension Post {
+    enum CodingKeys: String, CodingKey {
+        case body
+        case title
+        case slug
+        case roles
+    }
+    
+    convenience init(from decoder: Decoder) throws
+    {
+        self.init()
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.body = try values.decode(MarkDown.self, forKey: .body)
+        let decodedTitle = try? values.decode(String.self, forKey: .title)
+        let parsedTitle = decodedTitle ?? markdownParser.parse(body).title
+        if let title = parsedTitle {
+            self.title = title
+        } else {
+            throw ParseError.noTitle
+        }
+        let decodedSlug = try? values.decode(Slug.self, forKey: .slug)
+        let parsedSlug = decodedSlug ?? parsedTitle?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+        if let slug = parsedSlug {
+            self.slug = slug
+        } else {
+            throw ParseError.noSlug
+        }
+        
+        
+        let roles = try? values.decode(PostRole.self, forKey: .slug)
+        self.roles = roles ?? .blogPost
+    }
+}
+
+
+enum ParseError: Error {
+    case noTitle
+    case noSlug
 }
 
 struct PostRole: Codable, OptionSet {
@@ -71,4 +120,12 @@ struct PostRole: Codable, OptionSet {
 
 extension Post: CustomStringConvertible {
     var description: String { return self.title }
+}
+
+extension Post {
+    /// Renders a HTML body from body
+    var htmlBody: String {
+        markdownParser
+            .html(from: body)
+    }
 }

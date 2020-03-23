@@ -6,9 +6,9 @@
 //
 
 import Plot
+import Ink
 
 struct IndexViews {
-    
     /**
       A short template function, which all
      - Parameters:
@@ -26,7 +26,13 @@ struct IndexViews {
     }
     static func index(posts: [Post]) -> HTML {
         template(posts: posts, title: "Inuk Entatinment") {
-            .raw("It worked")
+            .group(
+                .forEach(posts, {
+                    .if($0.roles.contains(.blogPost),
+                        renderPost(post: $0)
+                    )
+                })
+            )
         }
     }
     
@@ -38,6 +44,12 @@ struct IndexViews {
                     )
                 })
             )
+        )
+    }
+    
+    static func renderPost(post: Post) -> Node<HTML.BodyContext> {
+        .article(
+            .raw(post.htmlBody)
         )
     }
 }
