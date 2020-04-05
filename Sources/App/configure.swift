@@ -15,7 +15,8 @@ public func configure(_ app: Application) throws {
         database: Environment.get("POSTGRES_DB") ?? "vapor_database"
     ), as: .psql)
     // Configure migrations
-    app.migrations.add(CreatePost())
+    app.migrations.add(PostMigration())
+    app.migrations.add(SettingsMigration())
     
     if app.environment == .development {
         try app.autoMigrate().wait()

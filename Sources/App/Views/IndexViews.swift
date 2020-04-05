@@ -24,8 +24,8 @@ struct IndexViews {
             )
         )
     }
-    static func index(_ navPosts: [Post], posts: [Post]) -> HTML {
-        template(posts: navPosts, title: "Inuk Entatinment") {
+    static func index(title: String,_ navPosts: [Post], posts: [Post]) -> HTML {
+        template(posts: navPosts, title: title) {
             .group(
                 .forEach(posts, {
                     .if($0.roles.contains(.blogPost),

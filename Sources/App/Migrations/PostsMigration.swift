@@ -8,7 +8,7 @@
 import Fluent
 import PostgresKit
 
-struct CreatePost: Migration {
+struct PostMigration: Migration {
     func prepare(on database: Database) -> EventLoopFuture<Void> {
         database.schema("posts")
             .id()
