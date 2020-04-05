@@ -6,7 +6,7 @@
 //
 
 import Plot
-import Ink
+
 
 struct IndexViews {
     /**
@@ -24,8 +24,8 @@ struct IndexViews {
             )
         )
     }
-    static func index(posts: [Post]) -> HTML {
-        template(posts: posts, title: "Inuk Entatinment") {
+    static func index(_ navPosts: [Post], posts: [Post]) -> HTML {
+        template(posts: navPosts, title: "Inuk Entatinment") {
             .group(
                 .forEach(posts, {
                     .if($0.roles.contains(.blogPost),
@@ -36,11 +36,15 @@ struct IndexViews {
         }
     }
     
+    static func postView(navLinks: [Post], _ post: Post) -> HTML {
+        template(posts: navLinks, title: post.title, { renderPost(post: post) })
+    }
+    
     static func navbar(pages: [Post]) -> Node<HTML.BodyContext> {
         .nav(.group(
                 .forEach(pages, {
                     .if($0.roles.contains(.navBar),
-                        Node<HTML.BodyContext>.a(.href($0.slug), .p("\($0.title)"))
+                        Node<HTML.BodyContext>.a(.href("/posts/"+$0.slug), .p("\($0.title)"))
                     )
                 })
             )

@@ -8,10 +8,23 @@
 import Fluent
 import Plot
 import Ink
-import Foundation
 
 typealias Slug = String
 typealias MarkDown = String
+
+struct PostCreation: Decodable {
+    var slug: Slug?
+    
+    var title: String?
+    
+    var body: MarkDown
+    
+    var roles: PostRole?
+    
+    func toDBModel() -> Post {
+        .init(slug: slug, title: title, body: body, roles: roles ?? .blogPost)
+    }
+}
 
 final class Post: Model {
     private let markdownParser = MarkdownParser()
@@ -58,7 +71,7 @@ final class Post: Model {
     }
 
 }
-
+/*
 extension Post {
     enum CodingKeys: String, CodingKey {
         case body
@@ -88,12 +101,13 @@ extension Post {
         }
         
         
-        let roles = try? values.decode(PostRole.self, forKey: .slug)
+        let roles = try? values.decode(PostRole.self, forKey: .roles)
+        print(roles?.rawValue)
         self.roles = roles ?? .blogPost
     }
 }
 
-
+*/
 enum ParseError: Error {
     case noTitle
     case noSlug
@@ -127,5 +141,21 @@ extension Post {
     var htmlBody: String {
         markdownParser
             .html(from: body)
+    }
+}
+
+extension Post {
+    static func getNav(on db: Database) -> EventLoopFuture<[Post]> {
+        Post.query(on: db)
+            .all()
+            .map { posts in
+                return posts.compactMap { post in
+                    if post.roles.contains(.navBar) {
+                        return post
+                    } else {
+                        return nil
+                    }
+                }
+            }
     }
 }

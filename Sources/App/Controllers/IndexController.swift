@@ -14,8 +14,13 @@ struct IndexController: RouteCollection {
     }
     
     func index(req: Request) throws -> EventLoopFuture<HTML> {
-        Post.query(on: req.db).all().map{
-            IndexViews.index(posts: $0)
-        }
+        Post.query(on: req.db)
+            .all()
+            .flatMap{ posts in
+                Post.getNav(on: req.db)
+                    .map { navPosts in
+                        IndexViews.index(navPosts, posts: posts)
+                    }
+            }
     }
 }

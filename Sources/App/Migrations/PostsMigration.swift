@@ -17,7 +17,7 @@ struct CreatePost: Migration {
             .field("body", .string, .required)
             .field("roles", .uint64, .required)
             .unique(on: "slug")
-        .create()
+            .create()
     }
     
     func revert(on database: Database) -> EventLoopFuture<Void> {
