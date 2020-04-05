@@ -30,11 +30,10 @@ struct PostsController: RouteCollection {
         return Post.query(on: req.db)
             .filter( \.$slug == slug )
             .first()
-            .flatMap { post in
-                Post.getNav(on: req.db).flatMapThrowing { navLinks -> HTML in
-                    guard let post = post else { throw Abort(.notFound) }
-                    return IndexViews.postView(navLinks: navLinks, post)
-                }
+            .unwrap(or: Abort(.notFound))
+            .and(Post.getNav(on: req.db))
+            .flatMapThrowing { post, navLinks in
+                return IndexViews.postView(navLinks: navLinks, post)
             }
     }
 }
